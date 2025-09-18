@@ -1,0 +1,39 @@
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+
+# Virtual environment folders
+venv/
+env/
+.venv/
+.env/
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temp files
+*.tmp
+temp_*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore data uploads (optional, if you store large datasets separately)
+uploads/
+data/
+
+# Do NOT ignore your model file
+# cow_breed_yolo11_FineTune.pt will be tracked
