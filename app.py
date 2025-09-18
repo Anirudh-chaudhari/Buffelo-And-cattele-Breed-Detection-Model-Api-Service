@@ -5,7 +5,7 @@ import os
 
 app = FastAPI()
 
-model = YOLO(r"D:\\cow-breed-final\\cow_breed_yolo11_FineTune.pt")
+model = YOLO(r"cow_breed_yolo11_FineTune.pt")
 
 # Pydantic model for response
 class PredictResponse(BaseModel):
