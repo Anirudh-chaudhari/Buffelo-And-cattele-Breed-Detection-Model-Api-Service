@@ -1,10 +1,29 @@
 from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from ultralytics import YOLO
 import os
 
 app = FastAPI()
 
+# ✅ CORS setup
+allowed_origins = [
+    "http://localhost:3000",        # Next.js local dev
+    "http://127.0.0.1:5500",        # plain HTML/JS dev (if you use it)
+    "https://your-site.vercel.app", # replace later with your real domain
+    "https://your-site.netlify.app" # replace later if using Netlify
+    # You can temporarily use "*" here during dev, but not in production
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,  # or ["*"] during testing
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Load YOLO model
 model = YOLO(r"cow_breed_yolo11_FineTune.pt")
 
 # Pydantic model for response
@@ -41,6 +60,59 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         return {"breed": None, "confidence": None}
+
+
+
+
+
+
+
+
+
+
+# from fastapi import FastAPI, File, UploadFile
+# from pydantic import BaseModel
+# from ultralytics import YOLO
+# import os
+
+# app = FastAPI()
+
+# model = YOLO(r"cow_breed_yolo11_FineTune.pt")
+
+# # Pydantic model for response
+# class PredictResponse(BaseModel):
+#     breed: str | None
+#     confidence: float | None
+
+# # Root GET endpoint
+# @app.get("/")
+# def root():
+#     return {"message": "YOLO Breed Predictor API is running! Use POST /predict to send images."}
+
+# @app.post("/predict", response_model=PredictResponse)
+# async def predict(file: UploadFile = File(...)):
+#     try:
+#         image_path = f"temp_{file.filename}"
+#         with open(image_path, "wb") as f:
+#             f.write(await file.read())
+
+#         results = model.predict(image_path, verbose=False)[0]
+
+#         if results.boxes is not None and len(results.boxes) > 0:
+#             breed = results.names[int(results.boxes.cls[0].item())]
+#             confidence = round(float(results.boxes.conf[0].item()), 4)
+#         elif hasattr(results, "probs") and results.probs is not None:
+#             breed = results.names[results.probs.top1]
+#             confidence = round(float(results.probs.top1conf), 4)
+#         else:
+#             breed = None
+#             confidence = None
+
+#         os.remove(image_path)
+#         return {"breed": breed, "confidence": confidence}
+
+#     except Exception as e:
+#         return {"breed": None, "confidence": None}
 
 
 
