@@ -1,3 +1,4 @@
+
 # 🐄 Cattle & Buffalo Breed Recognition API
 
 This project provides a **FastAPI-based backend** for cattle & buffalo breed recognition in India. It uses a **YOLOv11 model fine-tuned on Indian bovine datasets** to predict the breed of cattle/buffalo from an uploaded image.
@@ -127,51 +128,30 @@ During development, use `"*"` for testing, but restrict in production.
 
 ### Data Preprocessing & Dataset Split
 
-📘 **70% Training** → Train YOLOv11 model
-📗 **15% Validation** → Fine-tune, avoid overfitting
-📕 **15% Testing** → Evaluate accuracy
-
-![Dataset Split Diagram](https://img.icons8.com/color/512/pie-chart.png)
-
----
+* **70% Training** → Train YOLOv11 model
+* **15% Validation** → Fine-tune, avoid overfitting
+* **15% Testing** → Evaluate accuracy
+* Steps: resizing, augmentation, cleaning, balancing
 
 ### Model Training Workflow
 
-Dataset → YOLOv11 Training → Validation → Accuracy Evaluation → Optimized Model
-
-* Iterative training with epochs
-* Loss decreases, accuracy improves
-
-![Model Training Diagram](https://img.icons8.com/external-flat-juicy-fish/512/external-ai-machine-learning-flat-flat-juicy-fish.png)
-
----
+* Dataset → YOLOv11 Training → Validation → Accuracy Evaluation → Optimized Model
+* Iterative training with epochs (loss decreases, accuracy improves)
 
 ### Model Deployment (Backend)
 
-Trained Model → FastAPI Backend → Hosted on Render (API Endpoint)
-
+* Trained Model → FastAPI Backend → Hosted on Render (API Endpoint)
 * Output: JSON `{breed, confidence}`
-
-![Deployment Diagram](https://img.icons8.com/color/512/cloud.png)
-
----
 
 ### Connecting Frontend & Backend
 
-Website (Next.js + Tailwind) → API Request (CORS enabled) → FastAPI Backend → YOLOv11 Model → JSON Response → Result Displayed
-
-Example output: *"Breed: Jaffrabadi, Confidence: 99.3%"*
-
-![Frontend-Backend Integration](https://img.icons8.com/color/512/integration.png)
-
----
+* Website (Next.js + Tailwind) → API Request (CORS enabled) → FastAPI Backend → YOLOv11 Model → JSON Response → Result Displayed
+* Example output: *"Breed: Jaffrabadi, Confidence: 99.3%"*
 
 ### Publishing Website
 
-Localhost → Deploy frontend on **Netlify/Vercel** → Connect to Render API → Live Website 🌐
-Farmer workflow: 📷 Upload → ⚡ Prediction → ✅ Result
-
-![Publishing Flow](https://img.icons8.com/color/512/website.png)
+* Localhost (development) → Deploy frontend on **Netlify/Vercel** → Connect to Render API → Live Website 🌐
+* Farmer workflow: Upload → Prediction → Result
 
 ---
 
@@ -181,9 +161,6 @@ Farmer workflow: 📷 Upload → ⚡ Prediction → ✅ Result
 * **Backend**: FastAPI, Uvicorn, Pydantic
 * **Frontend**: Next.js, TailwindCSS
 * **Deployment**: Render (backend), Netlify/Vercel (frontend)
-
-Logos for reference:
-![FastAPI](https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png) ![Next.js](https://upload.wikimedia.org/wikipedia/commons/8/8e/Nextjs-logo.svg) ![TailwindCSS](https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg) ![Render](https://render.com/images/favicon.png)
 
 ---
 
