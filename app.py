@@ -2,34 +2,38 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from ultralytics import YOLO
-import os
+import os, json
 
 app = FastAPI()
 
 # ✅ CORS setup
 allowed_origins = [
-    "http://localhost:3000",        # Next.js local dev
-    "http://127.0.0.1:5500",        # plain HTML/JS dev (if you use it)
-    "https://your-site.vercel.app", # replace later with your real domain
-    "https://your-site.netlify.app" # replace later if using Netlify
-    # You can temporarily use "*" here during dev, but not in production
+    "http://localhost:3000",
+    "http://127.0.0.1:5500",
+    "https://your-site.vercel.app",
+    "https://your-site.netlify.app"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,  # or ["*"] during testing
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Load YOLO model
-model = YOLO(r"cow_breed_yolo11_FineTune.pt")
+model = YOLO(r"D:\cow-breed-final\cow_breed_yolo11_FineTune.pt")
+
+# Load breed metadata JSON
+with open(r"D:\cow-breed-final\breed_info.json", "r", encoding="utf-8") as f:
+    breed_info = json.load(f)
 
 # Pydantic model for response
 class PredictResponse(BaseModel):
     breed: str | None
     confidence: float | None
+    metadata: dict | None
 
 # Root GET endpoint
 @app.get("/")
@@ -38,30 +42,53 @@ def root():
 
 @app.post("/predict", response_model=PredictResponse)
 async def predict(file: UploadFile = File(...)):
+    image_path = f"temp_{file.filename}"
     try:
-        image_path = f"temp_{file.filename}"
+        # Save uploaded image
         with open(image_path, "wb") as f:
             f.write(await file.read())
 
+        # Run YOLO prediction
         results = model.predict(image_path, verbose=False)[0]
 
+        # Determine top prediction
+        breed, confidence = None, None
         if results.boxes is not None and len(results.boxes) > 0:
-            breed = results.names[int(results.boxes.cls[0].item())]
+            breed_idx = int(results.boxes.cls[0].item())
+            breed = results.names[breed_idx]
             confidence = round(float(results.boxes.conf[0].item()), 4)
         elif hasattr(results, "probs") and results.probs is not None:
-            breed = results.names[results.probs.top1]
+            breed_idx = results.probs.top1
+            breed = results.names[breed_idx]
             confidence = round(float(results.probs.top1conf), 4)
-        else:
-            breed = None
-            confidence = None
 
-        os.remove(image_path)
-        return {"breed": breed, "confidence": confidence}
+        # Get metadata
+        metadata = breed_info.get(breed, {
+            "origin": "Unknown",
+            "primary_use": "Unknown",
+            "average_milk_yield": "Unknown",
+            "average_weight": "Unknown",
+            "distribution": "Unknown",
+            "special_features": "Unknown"
+        })
+
+        return {
+            "breed": breed,
+            "confidence": confidence,
+            "metadata": metadata
+        }
 
     except Exception as e:
-        return {"breed": None, "confidence": None}
-
-
+        return {
+            "breed": None,
+            "confidence": None,
+            "metadata": {},
+            "error": str(e)
+        }
+    finally:
+        # Always remove temp image
+        if os.path.exists(image_path):
+            os.remove(image_path)
 
 
 

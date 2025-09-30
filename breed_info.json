@@ -1,0 +1,98 @@
+{
+    "Brown_Swiss": {
+        "origin": "Switzerland",
+        "primary_use": "High milk production",
+        "average_milk_yield": "4000-6000 liters/year",
+        "average_weight": "Male: 1000-1200 kg, Female: 600-700 kg",
+        "distribution": "Imported and used for crossbreeding in India",
+        "special_features": "Known for high butterfat milk and adaptability"
+    },
+    "Deoni": {
+        "origin": "Maharashtra, Karnataka, Andhra Pradesh",
+        "primary_use": "Dual-purpose (milk and draught)",
+        "average_milk_yield": "1200-1500 liters/year",
+        "average_weight": "Male: 500-600 kg, Female: 380-480 kg",
+        "distribution": "Maharashtra, Karnataka",
+        "special_features": "Hardy breed with disease resistance"
+    },
+    "Gir": {
+        "origin": "Gujarat (Gir forest region)",
+        "primary_use": "Milk production",
+        "average_milk_yield": "1200-1800 liters/year",
+        "average_weight": "Male: 550-600 kg, Female: 400-475 kg",
+        "distribution": "Gujarat, Maharashtra, Rajasthan",
+        "special_features": "Long ears, high milk butterfat content"
+    },
+    "Holstein_Friesian": {
+        "origin": "Netherlands, imported in India",
+        "primary_use": "Milk production",
+        "average_milk_yield": "6000-8000 liters/year",
+        "average_weight": "Male: 800-1000 kg, Female: 600-700 kg",
+        "distribution": "Widely used in crossbreeding in India",
+        "special_features": "Highest milk yielding cattle breed"
+    },
+    "Jaffrabadi": {
+        "origin": "Gujarat (Jamnagar, Bhavnagar)",
+        "primary_use": "Milk production and draught",
+        "average_milk_yield": "2000-3000 liters/year",
+        "average_weight": "Male: 600-700 kg, Female: 450-500 kg",
+        "distribution": "Saurashtra region of Gujarat",
+        "special_features": "Massive body, prominent forehead"
+    },
+    "Kangayam": {
+        "origin": "Tamil Nadu (Kangayam region)",
+        "primary_use": "Draught power",
+        "average_milk_yield": "500-800 liters/year",
+        "average_weight": "Male: 500-600 kg, Female: 350-400 kg",
+        "distribution": "Tamil Nadu",
+        "special_features": "Compact body, known for strength and endurance"
+    },
+    "Kankrej": {
+        "origin": "Gujarat, Rajasthan",
+        "primary_use": "Dual-purpose (milk and draught)",
+        "average_milk_yield": "1200-2000 liters/year",
+        "average_weight": "Male: 550-650 kg, Female: 400-480 kg",
+        "distribution": "Kutch, Banaskantha, Rajasthan",
+        "special_features": "Large horns, fast and powerful bullocks"
+    },
+    "Khillari": {
+        "origin": "Maharashtra (Satara, Sangli, Solapur)",
+        "primary_use": "Draught power",
+        "average_milk_yield": "500-700 liters/year",
+        "average_weight": "Male: 500-550 kg, Female: 350-400 kg",
+        "distribution": "Maharashtra, Karnataka",
+        "special_features": "Excellent endurance, fast trotting breed"
+    },
+    "Murrah": {
+        "origin": "Haryana, Punjab, Delhi",
+        "primary_use": "High milk yielding buffalo",
+        "average_milk_yield": "2000-3000 liters/year",
+        "average_weight": "Male: 550-650 kg, Female: 450-500 kg",
+        "distribution": "Widely spread across India",
+        "special_features": "Jet black color, tightly curved horns"
+    },
+    "Pandharpuri": {
+        "origin": "Maharashtra (Pandharpur, Solapur)",
+        "primary_use": "Milk production",
+        "average_milk_yield": "1500-2000 liters/year",
+        "average_weight": "Male: 500-550 kg, Female: 350-400 kg",
+        "distribution": "Maharashtra",
+        "special_features": "Very long and sword-shaped horns"
+    },
+    "Sahiwal": {
+        "origin": "Punjab (India and Pakistan)",
+        "primary_use": "High milk production",
+        "average_milk_yield": "2000-3000 liters/year",
+        "average_weight": "Male: 500-600 kg, Female: 350-450 kg",
+        "distribution": "Punjab, Haryana, Uttar Pradesh",
+        "special_features": "High resistance to heat, excellent milker"
+    },
+    "Toda": {
+        "origin": "Nilgiri Hills, Tamil Nadu",
+        "primary_use": "Milk production (buffalo breed)",
+        "average_milk_yield": "500-800 liters/year",
+        "average_weight": "Male: 400-450 kg, Female: 300-350 kg",
+        "distribution": "Nilgiri district",
+        "special_features": "Unique semi-wild buffalo, sacred to Toda tribe"
+    }
+}
