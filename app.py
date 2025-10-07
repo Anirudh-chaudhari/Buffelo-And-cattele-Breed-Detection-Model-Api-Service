@@ -15,6 +15,7 @@ allowed_origins = [
     "http://127.0.0.1:5500",
     "https://your-site.vercel.app",
     "https://your-site.netlify.app"
+    "https://22b2ea38-34b1-4c67-b500-94adf0117248.lovableproject.com"  # Add this
 ]
 
 app.add_middleware(
