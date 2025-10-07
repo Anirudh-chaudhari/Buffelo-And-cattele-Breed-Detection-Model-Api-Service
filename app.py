@@ -36,7 +36,7 @@ with open("D:\\cow-breed-final\\breed_info.json", "r", encoding="utf-8") as f:
 def validate_image_quality(image: np.ndarray):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     brightness = np.mean(gray)
-    sharpness = np.Laplacian(gray, cv2.CV_64F).var()
+    sharpness = cv2.Laplacian(gray, cv2.CV_64F).var()  # ✅ Corrected
     contrast = np.std(gray)
     entropy = shannon_entropy(gray)
 
@@ -107,7 +107,7 @@ async def predict(file: UploadFile = File(...)):
 
         # Step 3️⃣ — Determine species from metadata
         if breed:
-            species = breed_info.get(breed, {}).get("species", "Unknown")
+            species = breed_info.get(breed, {}).get("species", "Cow")  # Default to "Cow"
 
         return PredictResponse(
             breed=breed,
