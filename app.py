@@ -26,17 +26,19 @@ app.add_middleware(
 )
 
 # ✅ Load YOLO model
-model = YOLO(r"cow_breed_yolo11_FineTune.pt")
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "cow_breed_yolo11_FineTune.pt")
+model = YOLO(MODEL_PATH)
 
-# ✅ Load breed metadata JSON (to determine species)
-with open("breed_info.json", "r", encoding="utf-8") as f:
+# ✅ Load breed metadata
+JSON_PATH = os.path.join(os.path.dirname(__file__), "breed_info.json")
+with open(JSON_PATH, "r", encoding="utf-8") as f:
     breed_info = json.load(f)
 
 # ✅ Image Quality Validator
 def validate_image_quality(image: np.ndarray):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     brightness = np.mean(gray)
-    sharpness = cv2.Laplacian(gray, cv2.CV_64F).var()  # ✅ Corrected
+    sharpness = cv2.Laplacian(gray, cv2.CV_64F).var()
     contrast = np.std(gray)
     entropy = shannon_entropy(gray)
 
@@ -51,7 +53,7 @@ def validate_image_quality(image: np.ndarray):
 
     return {"status": "ok"}
 
-# ✅ Pydantic model for simplified response
+# ✅ Response Model
 class PredictResponse(BaseModel):
     breed: str | None
     confidence: float | None
@@ -61,9 +63,9 @@ class PredictResponse(BaseModel):
 # ✅ Root endpoint
 @app.get("/")
 def root():
-    return {"message": "🐄 YOLO Breed Predictor API with Image Validator is running!"}
+    return {"message": "🐄 YOLO Breed Predictor API is running!"}
 
-# ✅ Main prediction route
+# ✅ Prediction endpoint
 @app.post("/predict", response_model=PredictResponse)
 async def predict(file: UploadFile = File(...)):
     image_path = f"temp_{file.filename}"
@@ -72,7 +74,7 @@ async def predict(file: UploadFile = File(...)):
         with open(image_path, "wb") as f:
             f.write(await file.read())
 
-        # Load image for validation
+        # Load image
         image = cv2.imread(image_path)
         if image is None:
             return PredictResponse(
@@ -82,7 +84,7 @@ async def predict(file: UploadFile = File(...)):
                 quality={"status": "error", "reason": "Invalid image file"}
             )
 
-        # Step 1️⃣ — Image quality check
+        # Step 1 — Validate quality
         quality = validate_image_quality(image)
         if quality["status"] == "error":
             return PredictResponse(
@@ -92,7 +94,7 @@ async def predict(file: UploadFile = File(...)):
                 quality=quality
             )
 
-        # Step 2️⃣ — Run YOLO classification
+        # Step 2 — YOLO prediction
         results = model.predict(image_path, verbose=False)[0]
         breed, confidence, species = None, None, None
 
@@ -105,9 +107,9 @@ async def predict(file: UploadFile = File(...)):
             breed = results.names[breed_idx]
             confidence = round(float(results.boxes.conf[0].item()), 4)
 
-        # Step 3️⃣ — Determine species from metadata
+        # Step 3 — Determine species
         if breed:
-            species = breed_info.get(breed, {}).get("species", "Cow")  # Default to "Cow"
+            species = breed_info.get(breed, {}).get("species", "Cow")
 
         return PredictResponse(
             breed=breed,
@@ -123,12 +125,14 @@ async def predict(file: UploadFile = File(...)):
             species=None,
             quality={"status": "error", "reason": str(e)}
         )
-
     finally:
-        # Always clean up
         if os.path.exists(image_path):
             os.remove(image_path)
 
+# ✅ Startup log
+@app.on_event("startup")
+async def startup_event():
+    print("✅ FastAPI server started! YOLO model loaded successfully!")
 
 
 # from fastapi import FastAPI, File, UploadFile
