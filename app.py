@@ -23,10 +23,10 @@ app.add_middleware(
 )
 
 # Load YOLO model
-model = YOLO(r"D:\cow-breed-final\cow_breed_yolo11_FineTune.pt")
+model = YOLO(r"cow_breed_yolo11_FineTune.pt")
 
 # Load breed metadata JSON
-with open(r"D:\cow-breed-final\breed_info.json", "r", encoding="utf-8") as f:
+with open("breed_info.json", "r", encoding="utf-8") as f:
     breed_info = json.load(f)
 
 # Pydantic model for response
