@@ -1,15 +1,18 @@
+import os
+import json
+import cv2
+import numpy as np
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from ultralytics import YOLO
 from skimage.measure import shannon_entropy
-import cv2
-import numpy as np
-import os, json
 
-app = FastAPI()
+# ---------------------------
+# App & CORS Setup
+# ---------------------------
+app = FastAPI(title="Cow/Buffalo Breed Predictor API")
 
-# ✅ CORS setup
 allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:5500",
@@ -25,16 +28,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Load YOLO model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "cow_breed_yolo11_FineTune.pt")
-model = YOLO(MODEL_PATH)
+# ---------------------------
+# Load YOLO model
+# ---------------------------
+MODEL_PATH = "cow_breed_yolo11_FineTune.pt"
+try:
+    model = YOLO(MODEL_PATH)
+    print(f"✅ YOLO model loaded: {MODEL_PATH}")
+except Exception as e:
+    print(f"❌ Failed to load YOLO model: {e}")
+    model = None
 
-# ✅ Load breed metadata
-JSON_PATH = os.path.join(os.path.dirname(__file__), "breed_info.json")
-with open(JSON_PATH, "r", encoding="utf-8") as f:
-    breed_info = json.load(f)
+# ---------------------------
+# Load breed metadata
+# ---------------------------
+BREED_JSON = "breed_info.json"
+if os.path.exists(BREED_JSON):
+    with open(BREED_JSON, "r", encoding="utf-8") as f:
+        breed_info = json.load(f)
+else:
+    print(f"⚠️ {BREED_JSON} not found!")
+    breed_info = {}
 
-# ✅ Image Quality Validator
+# ---------------------------
+# Image quality validator
+# ---------------------------
 def validate_image_quality(image: np.ndarray):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     brightness = np.mean(gray)
@@ -53,29 +71,40 @@ def validate_image_quality(image: np.ndarray):
 
     return {"status": "ok"}
 
-# ✅ Response Model
+# ---------------------------
+# Response Model
+# ---------------------------
 class PredictResponse(BaseModel):
     breed: str | None
     confidence: float | None
     species: str | None
     quality: dict
 
-# ✅ Root endpoint
+# ---------------------------
+# Routes
+# ---------------------------
 @app.get("/")
 def root():
-    return {"message": "🐄 YOLO Breed Predictor API is running!"}
+    return {"message": "🐄 YOLO Breed Predictor API running!"}
 
-# ✅ Prediction endpoint
 @app.post("/predict", response_model=PredictResponse)
 async def predict(file: UploadFile = File(...)):
-    image_path = f"temp_{file.filename}"
+    if model is None:
+        return PredictResponse(
+            breed=None,
+            confidence=None,
+            species=None,
+            quality={"status": "error", "reason": "YOLO model not loaded"}
+        )
+
+    temp_path = f"/tmp/{file.filename}"
     try:
-        # Save uploaded image
-        with open(image_path, "wb") as f:
+        # Save uploaded file
+        with open(temp_path, "wb") as f:
             f.write(await file.read())
 
         # Load image
-        image = cv2.imread(image_path)
+        image = cv2.imread(temp_path)
         if image is None:
             return PredictResponse(
                 breed=None,
@@ -84,7 +113,7 @@ async def predict(file: UploadFile = File(...)):
                 quality={"status": "error", "reason": "Invalid image file"}
             )
 
-        # Step 1 — Validate quality
+        # Validate quality
         quality = validate_image_quality(image)
         if quality["status"] == "error":
             return PredictResponse(
@@ -94,8 +123,8 @@ async def predict(file: UploadFile = File(...)):
                 quality=quality
             )
 
-        # Step 2 — YOLO prediction
-        results = model.predict(image_path, verbose=False)[0]
+        # YOLO prediction
+        results = model.predict(temp_path, verbose=False)[0]
         breed, confidence, species = None, None, None
 
         if hasattr(results, "probs") and results.probs is not None:
@@ -107,7 +136,6 @@ async def predict(file: UploadFile = File(...)):
             breed = results.names[breed_idx]
             confidence = round(float(results.boxes.conf[0].item()), 4)
 
-        # Step 3 — Determine species
         if breed:
             species = breed_info.get(breed, {}).get("species", "Cow")
 
@@ -125,14 +153,18 @@ async def predict(file: UploadFile = File(...)):
             species=None,
             quality={"status": "error", "reason": str(e)}
         )
-    finally:
-        if os.path.exists(image_path):
-            os.remove(image_path)
 
-# ✅ Startup log
-@app.on_event("startup")
-async def startup_event():
-    print("✅ FastAPI server started! YOLO model loaded successfully!")
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+# ---------------------------
+# Run Uvicorn
+# ---------------------------
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("app:app", host="0.0.0.0", port=port)
 
 
 # from fastapi import FastAPI, File, UploadFile
