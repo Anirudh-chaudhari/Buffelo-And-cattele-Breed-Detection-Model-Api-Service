@@ -3,3 +3,4 @@ uvicorn[standard]==0.23.2
 ultralytics==8.3.202
 python-multipart==0.0.20
 pydantic==2.11.7
+scikit-image==0.25.2
